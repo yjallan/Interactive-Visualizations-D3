@@ -1,0 +1,16 @@
+Question 1.a Table
+
+1) These columns are totally empty. Hence I have deleted them.
+	a) Internally displaced persons (IDPs)
+	b) Returned IDPs
+	c) Stateless persons
+2) I have alphabetically arranged the Country/Territory of Asylum.
+3) I have alphabetically arranged the Country of Origin.
+3) Replaced the "*"s with blank.
+4) Changed font type from Calibri to Cambria.
+5) Added comma separator for large numbers.
+
+Question 1.b Chart
+
+1) The Columns "Female 5-17" and "Male 5-17" have no data in it. So they are removed from the CSV file.
+2) I have created a bar chart visualizing the number of refugees by Country, Age and Sex. This visualization is done for the year 2010.

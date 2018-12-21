@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Interactive Visualization</title>
+<style>
+
+ .bar {
+      fill: steelblue;
+    }
+	.bar_new {
+      fill: steelblue;
+    }
+
+ .bar:hover {
+      fill: brown;
+    }
+	
+ .label {
+      fill: black;
+      font: 10px sans-serif;
+    }
+.chart rect {
+  fill: gray;
+}
+
+.chart_new rect {
+  fill: gray;
+}
+
+.chart text {
+
+  font: 10px arial;
+  text-anchor: end;
+}
+
+table.hidden {display: none;}
+
+</style>
+<body>
+
+<script src="../lib/d3.v3.min.js"></script>
+<script>
+var dataset=[{product:'Product A',freq:{Q1:576, Q2:1176, Q3:1009, Q4:494}},
+{product:'Product B',freq:{Q1:959, Q2:1653, Q3:1999, Q4:697}},
+{product:'Product C',freq:{Q1:3210, Q2:4220, Q3:1648, Q4:919}},
+{product:'Product D',freq:{Q1:589, Q2:2043, Q3:1153, Q4:911}},
+{product:'Product E',freq:{Q1:2599, Q2:1333, Q3:818, Q4:1713}},
+{product:'Product F',freq:{Q1:431, Q2:324, Q3:715, Q4:421}},
+{product:'Product G',freq:{Q1:1457, Q2:2557, Q3:2245, Q4:762}},
+{product:'Product H',freq:{Q1:2573, Q2:3357, Q3:1598, Q4:1287}}];
+
+//console.log(dataset);
+//console.log(dataset.length);
+//console.log(dataset[0]);
+//console.log(dataset[0].product);
+//console.log(dataset[0].freq);
+//console.log(dataset[0].freq.Q1);
+var barHeight=30;
+
+ var margin = {
+        top: 20,
+        right: 20,
+        bottom: 30,
+        left: 40
+      };
+    var width = 960 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
+
+  var svg = d3.select("body").append("svg")
+        .attr("id","AAA")
+		.attr("width", 450)
+        .attr("height", 300)
+      .append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+	
+  var newarr = [];
+ var products = ['Product H', 'Product G','Product F','Product E','Product D','Product C', 'Product B', 'Product A']
+ var quarters = ['Q4', 'Q3','Q2','Q1']
+ 
+ for (i=0;i<dataset.length;i++){
+newarr.push(dataset[i].freq.Q1+dataset[i].freq.Q2+dataset[i].freq.Q3+dataset[i].freq.Q4);
+ }
+ 
+ //console.log(d3.max(newarr));
+ //console.log("A");
+ 
+ 
+   var x = d3.scale.linear().range([0, width]).domain([0,3*(d3.max(newarr))]);
+   var y = d3.scale.linear().range([220, 0]).domain([0,7.3]);
+   
+   
+   //console.log(x.domain());
+   //console.log(y.domain());
+   
+   
+  
+   var yAxis = d3.svg.axis()
+				.orient("left")
+				.scale(y)
+				.tickSize(5)
+				 .tickFormat(function(d,i){ return products[i]; })
+					.tickValues(d3.range(8));
+
+var bar = svg.selectAll("g")
+    .data(newarr)
+    .enter().append("g")
+    .attr("transform", function(d, i) { return "translate(60," + (i) * barHeight + ")"; });
+
+//console.log(newarr);
+
+	bar.append("rect")
+    .attr("width", x)
+    .attr("height", barHeight-5 )
+	.style('fill', 'gray')
+	.on('mouseover', function(d, i) {
+				 d3.select(this).style('fill', '#23BCD1');
+				 //console.log(i);
+				 	
+var svg_new = d3.select("body").append("svg")
+        .attr("id","BBB")
+		.attr("width", 450)
+        .attr("height", 300)
+      .append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+   
+	newarr_new=[];
+	
+	newarr_new.push(dataset[i].freq.Q1,dataset[i].freq.Q2,dataset[i].freq.Q3,dataset[i].freq.Q4);
+ 
+ //console.log(newarr_new);
+var x_new = d3.scale.linear().range([0, width]).domain([0,(d3.max(newarr))]);
+var y_new = d3.scale.linear().range([220, 0]).domain([0,7.3]);
+	
+		var yAxis_new = d3.svg.axis()
+				.orient("left")
+				.scale(y_new)
+				.tickSize(5)
+				 .tickFormat(function(d,i){ return quarters[i]; })
+					.tickValues(d3.range(8));
+					
+var bar_new = svg_new.selectAll("g")
+    .data(newarr_new)
+    .enter().append("g")
+    .attr("transform", function(d, i) { return "translate(50," + (i) * barHeight + ")"; });
+
+	bar_new.append("rect")
+    .attr("width", x_new)
+    .attr("height", barHeight-5 )
+	.style('fill', '#23BCD1');
+
+	bar_new.append("text")
+    .attr("x", 3)
+    .attr("y", barHeight/2)
+    .attr("dy", ".35em")
+    .text(function(d) { return "$"+d3.format(',')(d); })
+    .attr("fill", "white")
+	.style("font-weight", "bold")
+	.style("font-size", "12px");
+	
+	svg_new.append("g")
+    .attr("transform", "translate(50,-117)")
+    .attr("text-anchor", "middle")
+    .attr("font-family", "arial")
+    .attr("font-size", "13px")
+    .style("stroke", "none")
+    .style("fill", "none")
+    .style("stroke-width", 1)
+    //.style("shape-rendering", "crispEdges")
+    .call(yAxis_new)
+    .selectAll("text")
+    .attr("stroke", "gray")
+    .attr("fill", "gray");
+				 })
+				 .on('mouseout', function(d) {
+                 d3.select(this).style('fill', 'gray');
+				 d3.select("#BBB").remove();
+				 });
+	
+	
+	bar.append("text")
+    .attr("x", 10)
+    .attr("y", barHeight/2)
+    .attr("dy", ".35em")
+    .text(function(d) { return "$"+d3.format(',')(d); })
+    .attr("fill", "white")
+	.style("font-weight", "bold")
+	.style("font-size", "12px");
+	
+	svg.append("g")
+    .attr("transform", "translate(58,5)")
+    .attr("text-anchor", "middle")
+    .attr("font-family", "arial")
+    .attr("font-size", "13px")
+    .style("stroke", "none")
+    .style("fill", "none")
+    .style("stroke-width", 0.5)
+    //.style("shape-rendering", "crispEdges")
+    .call(yAxis)
+    .selectAll("text")
+    .attr("stroke", "gray")
+    .attr("fill", "gray");
+	/////
+
+
+
+</script>
+</body>
+

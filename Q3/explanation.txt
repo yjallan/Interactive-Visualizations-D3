@@ -1,0 +1,1 @@
+Log Graphs are useful when the data is exponentially increasing or decreasing. In the given case, there is a crowd of the values of 'Distribution' over a very small range of 'Body mass'. The log graph helps to visualize this better.

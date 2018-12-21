@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Scatteplots</title>
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.dot {
+  stroke: #000;
+}
+
+</style>
+<body>
+<script src="../lib/d3.v3.min.js"></script>
+<script>
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+//1st GRAPH//////////////////////////////////
+var x = d3.scale.linear()
+    .range([0, width-250]);
+
+var y = d3.scale.linear()
+    .range([height, 20]);
+
+var color = d3.scale.category10();
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", (height + margin.top + margin.bottom))
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("data.tsv", function(data) {
+  //console.log(error);
+  
+  data.forEach(function(d) {
+    d.Distribution = +d.Distribution;
+    d.BodyMass = +d.BodyMass;
+	//console.log(d.Species);
+  });
+
+  x.domain(d3.extent(data, function(d) { return d.BodyMass; })).nice();
+  y.domain(d3.extent(data, function(d) { return d.Distribution; })).nice();
+
+  //console.log(x.domain());
+  
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width-250)
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Body Mass");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+	  .attr("x", -20)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Distribution");
+
+	var shapes_var = { "triangle": d3.svg.symbol().type("triangle-up"), "circle": d3.svg.symbol().type("circle"), "square": d3.svg.symbol().type("square")};	  
+
+	//plotting the points here
+	svg.selectAll("path")
+      .data(data)
+    .enter().append("path")
+		.attr("class","dot")
+		.attr("transform", function(d) { return "translate(" + x(d.BodyMass) + "," +  y(d.Distribution) + ")";})
+		.attr("cx", function(d){return x(d.BodyMass);})
+		.attr("cy", function(d){return y(d.Distribution);})
+		.attr("d", function(d,i){
+			//console.log(d);
+			if (d.Species === "Lagomorpha") return shapes_var.circle();
+			else if (d.Species === "Didelphimorphia") return shapes_var.square();
+			else return shapes_var.triangle();
+		}).style("stroke", function(d,i){
+			if (d.Species === "Lagomorpha") return "red";
+			else if (d.Species === "Didelphimorphia") return "blue";
+			else return "green";
+		})
+		.style("fill", "none");
+		
+	//console.log(color.domain());
+  var Legend1 = svg.append('g')
+		.attr("transform", function (d,i){
+		return "translate("+(width - 80)+","+(margin.top+30)+")";
+		});
+		
+		Legend1.append('path')
+			.attr("d",d3.svg.symbol().type("triangle").size(128))
+			.attr('class', 'legend')
+			.style('stroke', 'red')
+			.style('fill','none');
+
+		Legend1.append('text')
+			.attr("dy",".35em")
+			.attr('dx','1em')
+			.style("text-anchor","start")
+			.text('Lagomorpha');
+		
+		var Legend2 = svg.append('g')
+		.attr("transform", function (d,i){return "translate("+(width - 80)+","+(margin.top+50)+")";});
+		
+		Legend2.append('path')
+			.attr("d",d3.svg.symbol().type("square").size(128))
+			.attr('class', 'legend')
+			.style('stroke', 'blue')
+			.style('fill','none');
+
+		Legend2.append('text')
+			.attr("dy","0.35em")
+			.attr('dx','1em')
+			.style("text-anchor","start")
+			.text('Didelphimorphia');
+
+	var Legend3 = svg.append('g')
+		.attr("transform", function (d,i){return "translate("+(width - 80)+","+(margin.top+70)+")";});
+		
+		Legend3.append('path')
+			.attr("d",d3.svg.symbol().type("triangle-up").size(128))
+			.attr('class', 'legend')
+			.style('stroke', 'green')
+			.style('fill','none');
+
+		Legend3.append('text')
+			.attr("dy","0.35em")
+			.attr('dx','1em')
+			.style("text-anchor","start")
+			.text('Dasyuromorphia');
+
+	svg.append("text")
+	.attr("x", (width/4))
+	.attr("y",0)
+	.text("Distribution vs Body Mass (Linear Scale)")
+	.style("font-size","15px");
+});
+
+//2ND GRAPH//////////////////////////////////
+var xlog = d3.scale.log()
+    .range([0, width-250]);
+
+var ylog = d3.scale.log()
+    .range([height, 20]);
+
+var xAxisLog = d3.svg.axis()
+    .scale(xlog)
+    .orient("bottom");
+var yAxisLog = d3.svg.axis()
+    .scale(ylog)
+    .orient("left");
+
+var svgLog = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", (height + margin.top + margin.bottom))
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.tsv("data.tsv", function(data) {
+  //console.log(error);
+  
+  data.forEach(function(d) {
+    d.Distribution = +d.Distribution;
+    d.BodyMass = +d.BodyMass;
+	//console.log(d.Species);
+  });
+
+  xlog.domain(d3.extent(data, function(d) { return d.BodyMass; }));
+  ylog.domain(d3.extent(data, function(d) { return d.Distribution; }));
+
+console.log(xlog.domain());
+  
+  svgLog.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxisLog)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width-250)
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Body Mass");
+
+  svgLog.append("g")
+      .attr("class", "y axis")
+      .call(yAxisLog)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+	  .attr("x", -20)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Distribution");
+
+	var shapes_var = { "triangle": d3.svg.symbol().type("triangle-up"), "circle": d3.svg.symbol().type("circle"), "square": d3.svg.symbol().type("square")};	  
+
+	//plotting the points here
+	svgLog.selectAll("path")
+      .data(data)
+    .enter().append("path")
+		.attr("class","dot")
+		.attr("transform", function(d) { return "translate(" + xlog(d.BodyMass) + "," +  ylog(d.Distribution) + ")";})
+		.attr("cx", function(d){return xlog(d.BodyMass);})
+		.attr("cy", function(d){return ylog(d.Distribution);})
+		.attr("d", function(d,i){
+			//console.log(d);
+			if (d.Species === "Lagomorpha") return shapes_var.circle();
+			else if (d.Species === "Didelphimorphia") return shapes_var.square();
+			else return shapes_var.triangle();
+		}).style("stroke", function(d,i){
+			if (d.Species === "Lagomorpha") return "red";
+			else if (d.Species === "Didelphimorphia") return "blue";
+			else return "green";
+		})
+		.style("fill", "none");
+		
+	//console.log(color.domain());
+  var Legend1 = svgLog.append('g')
+		.attr("transform", function (d,i){
+		return "translate("+(width - 80)+","+(margin.top+30)+")";
+		});
+		
+		Legend1.append('path')
+			.attr("d",d3.svg.symbol().type("triangle").size(128))
+			.attr('class', 'legend')
+			.style('stroke', 'red')
+			.style('fill','none');
+
+		Legend1.append('text')
+			.attr("dy",".35em")
+			.attr('dx','1em')
+			.style("text-anchor","start")
+			.text('Lagomorpha');
+		
+		var Legend2 = svgLog.append('g')
+		.attr("transform", function (d,i){return "translate("+(width - 80)+","+(margin.top+50)+")";});
+		
+		Legend2.append('path')
+			.attr("d",d3.svg.symbol().type("square").size(128))
+			.attr('class', 'legend')
+			.style('stroke', 'blue')
+			.style('fill','none');
+
+		Legend2.append('text')
+			.attr("dy","0.35em")
+			.attr('dx','1em')
+			.style("text-anchor","start")
+			.text('Didelphimorphia');
+
+	var Legend3 = svgLog.append('g')
+		.attr("transform", function (d,i){return "translate("+(width - 80)+","+(margin.top+70)+")";});
+		
+		Legend3.append('path')
+			.attr("d",d3.svg.symbol().type("triangle-up").size(128))
+			.attr('class', 'legend')
+			.style('stroke', 'green')
+			.style('fill','none');
+
+		Legend3.append('text')
+			.attr("dy","0.35em")
+			.attr('dx','1em')
+			.style("text-anchor","start")
+			.text('Dasyuromorphia');
+
+	svgLog.append("text")
+	.attr("x", (width/4))
+	.attr("y",0)
+	.text("Distribution vs Body Mass (Log Scale)")
+	.style("font-size","15px");
+});
+</script>
+</body>

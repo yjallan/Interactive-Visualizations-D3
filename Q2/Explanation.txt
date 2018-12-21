@@ -1,0 +1,1 @@
+I've scaled the radii of the nodes using Math.sqrt(weight*20). This gives a good visual representation of the nodes.
